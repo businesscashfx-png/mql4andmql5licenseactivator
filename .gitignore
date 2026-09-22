@@ -1,0 +1,17 @@
+# compilaciones del EXE y objetos intermedios
+desktop/.build/
+desktop/js_embed.h
+
+# dependencias clonadas (quickjs) — se vuelven a clonar con tools/clone-quickjs.sh
+desktop/deps/quickjs/
+
+# python venv
+.venv-zig/
+
+# archivos temporales
+*.obj
+*.res
+desktop/*.pdb
+
+# NOTA: desktop/BCFX_Activador_Windows.exe SÍ se versiona (entregable final)
+

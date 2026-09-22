@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BCFX Activador de Licencias — MQL4 / MQL5</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">BCFX</span>
+      <div class="brand-txt">
+        <h1>Activador de Licencias</h1>
+        <p>MQL4 · MQL5 · MT4 · MT5</p>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <a class="btn primary download-exe" href="/desktop/BCFX_Activador_Windows.exe" download="BCFX_Activador_Windows.exe" title="Descargar el programa para Windows 10/11">
+        ⬇ Descargar programa Windows (.exe)
+      </a>
+      <div class="badge">100% offline · tu código no sale de tu equipo</div>
+    </div>
+  </header>
+
+  <main>
+    <!-- ============ PASO 1 : subir el EA ============ -->
+    <section class="card" id="card-file">
+      <div class="step-num">1</div>
+      <div class="card-body">
+        <h2>Sube tu Asesor Experto (EA)</h2>
+        <p class="muted">Archivos <b>.mq4</b> (MT4) o <b>.mq5</b> (MT5). El sistema se inserta automáticamente.</p>
+        <div class="drop" id="drop">
+          <input type="file" id="fileInput" accept=".mq4,.mq5" hidden>
+          <div class="drop-icon">⇩</div>
+          <div class="drop-txt">Arrastra aquí el archivo <b>.mq4</b> / <b>.mq5</b><br><span>o haz clic para buscarlo</span></div>
+          <div class="file-meta" id="fileMeta" hidden></div>
+        </div>
+        <div class="row line">
+          <label class="switch">
+            <input type="checkbox" id="verbatim" checked>
+            <span class="track"></span>
+            Inyectar la llamada de verificación en <b>OnInit</b> / <b>OnTick</b>
+          </label>
+        </div>
+        <button class="btn primary big" id="addSystem" disabled>⚙ Agregar el sistema</button>
+        <p class="hint" id="fileHint">Selecciona un EA para continuar.</p>
+      </div>
+    </section>
+
+    <!-- ============ PASO 2 : opciones de licencia ============ -->
+    <section class="card" id="card-lic" hidden>
+      <div class="step-num">2</div>
+      <div class="card-body">
+        <h2>Configurar la activación</h2>
+        <p class="muted">Elige nombre, vigencia y restricción de broker / cuenta.</p>
+
+        <div class="grid">
+          <!-- Nombre -->
+          <div class="field">
+            <label for="licensee">Nombre de la persona <span class="req">*</span></label>
+            <input type="text" id="licensee" placeholder="Ej: Juan Perez" autocomplete="off">
+          </div>
+
+          <!-- Tipo -->
+          <div class="field">
+            <label>Tipo de licencia</label>
+            <div class="seg">
+              <button class="seg-btn" data-mode="T">⏱ Por tiempo</button>
+              <button class="seg-btn active" data-mode="U">∞ Ilimitada</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Vigencia (modo T) -->
+        <div class="grid" id="durRow" hidden>
+          <div class="field">
+            <label for="durVal">Duración</label>
+            <div class="row">
+              <input type="number" id="durVal" min="1" value="30" style="width:45%">
+              <select id="durUnit" style="width:55%">
+                <option value="d">Días</option>
+                <option value="m">Meses (30 días)</option>
+                <option value="y">Años (365 días)</option>
+                <option value="h">Horas</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label for="until">…o fecha límite exacta</label>
+            <input type="date" id="until">
+          </div>
+        </div>
+
+        <!-- Broker -->
+        <div class="field full">
+          <label>Restricción de broker</label>
+          <div class="seg three">
+            <button class="seg-btn" data-broker="any">🌐 Cualquier broker</button>
+            <button class="seg-btn active" data-broker="one">🔒 Un broker específico</button>
+          </div>
+          <input type="text" id="broker" class="mt" placeholder="Escribe el nombre EXACTO del broker (ej: ICMarkets, FXPro, Exness)">
+          <p class="hint">Debe coincidir con lo que muestra <b>AccountCompany()</b> en MT4/MT5. Se compara sin mayúsculas y sin espacios de más.</p>
+        </div>
+
+        <!-- Cuenta -->
+        <div class="field full">
+          <label>Restricción de cuenta</label>
+          <div class="seg three">
+            <button class="seg-btn active" data-acc="all">👥 Todas las cuentas</button>
+            <button class="seg-btn" data-acc="one">🔢 Una cuenta específica</button>
+          </div>
+          <input type="text" id="account" class="mt" placeholder="Número de cuenta (ej: 12345678)" inputmode="numeric">
+        </div>
+
+        <!-- Resumen -->
+        <div class="summary" id="summary">
+          <div class="sum-title">Resumen de la activación</div>
+          <div class="sum-grid" id="summaryGrid"></div>
+        </div>
+
+        <div class="actions">
+          <button class="btn primary big" id="generate">🔑 Activar licencia y proteger</button>
+          <button class="btn ghost" id="resetFile">↺ Cambiar EA</button>
+        </div>
+        <p class="hint" id="genHint"></p>
+      </div>
+    </section>
+
+    <!-- ============ PASO 3 : resultado ============ -->
+    <section class="card" id="card-out" hidden>
+      <div class="step-num">3</div>
+      <div class="card-body">
+        <h2>Licencia generada y código protegido</h2>
+        <p class="muted">Descarga el EA protegido, entrega el archivo <b>.lic</b> a tu cliente y guárdalo de respaldo.</p>
+
+        <div class="out-license">
+          <div class="out-label">Licencia (para pegar en BCFX_LICENCIA)</div>
+          <div class="licbox">
+            <code id="licText"></code>
+            <button class="btn mini" id="copyLic">Copiar</button>
+          </div>
+        </div>
+
+        <div class="license-meta" id="licMeta"></div>
+
+        <div class="out-license">
+          <div class="out-label">Contenido del archivo <b>LICENCIA.lic</b></div>
+          <div class="licbox">
+            <code id="licFileText"></code>
+            <button class="btn mini" id="copyLicFile">Copiar</button>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn primary big" id="downloadEA">⬇ Descargar EA protegido</button>
+          <button class="btn primary big" id="downloadLic">⬇ Descargar .lic</button>
+          <button class="btn ghost" id="copySource">Copiar código completo</button>
+        </div>
+
+        <div class="preview">
+          <div class="preview-head">
+            <span>Vista del código protegido</span>
+            <span class="muted" id="previewInfo"></span>
+          </div>
+          <pre id="previewSrc" class="code-out"></pre>
+        </div>
+
+        <div class="note">
+          <b>¿Cómo lo usa tu cliente?</b>
+          <ol>
+            <li>Guardar el <b>EA protegido</b> (<code>.mq4</code>/<code>.mq5</code>) y el archivo <code>.lic</code>.</li>
+            <li>Abrir el EA en MetaEditor, compilarlo y el EA ya funciona en su MT con la licencia incrustada.</li>
+            <li>Si entregas solo el <code>.lic</code>: pegar su contenido en el parámetro <b>BCFX_LICENCIA</b> del EA y compilar.</li>
+            <li>El EA solo trabaja para <b>el nombre, el broker y la cuenta</b> activados; al vencer el tiempo se detiene solo.</li>
+          </ol>
+        </div>
+
+        <div class="warn">
+          ⚠ <b>Anti-descompilación:</b> el activador está firmado (SHA-256) y ofuscado. Si intentan
+          descompilar o alterar el código compilado, el EA deja de funcionar para esa copia.
+          Compila siempre a <code>.ex4</code>/<code>.ex5</code> antes de distribuir.
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    BCFX Activador de Licencias · Funciona 100% en tu navegador (criptografía en cliente) · Compatible MT4 y MT5
+  </footer>
+
+  <div class="toast" id="toast" hidden></div>
+
+  <script src="crypto.js"></script>
+  <script src="mql.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
